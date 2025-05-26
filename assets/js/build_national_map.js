@@ -15,11 +15,11 @@ const viz_options = {
   pop_cutoff_high: 150,
   use_col: 'vr_m',
   lower: 0.004,
-  upper: 0.014,
-  legend_breaks: ['0.4%', '0.6%', '0.8%', '1.0%', '1.2%', '1.4%'],
+  upper: 0.012,
+  legend_breaks: ['0.4%', '0.6%', '0.8%', '1.0%', '1.2%'],
   fill_palette: [
-    '#30123B','#4454C4','#4490FE','#1FC8DE','#29EFA2','#7DFF56','#C1F334',
-    '#F1CA3A','#FE922A'
+    '#352A87','#0E5FDB','#1283D4','#06A5C7','#33B7A0','#8ABE75','#D1BA58','#FBC831',
+    '#F9FB0E'
   ],
   weight: 1.25,
   color: '#444444',

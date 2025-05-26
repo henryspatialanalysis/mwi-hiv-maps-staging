@@ -255,7 +255,7 @@ function new_geojson(data, options){
       layer.on('mouseover', function(){
         layer.setStyle({
         weight: 4,
-        color: '#FFFF00',
+        color: '#000000',
       });
       layer.bringToFront();
     });

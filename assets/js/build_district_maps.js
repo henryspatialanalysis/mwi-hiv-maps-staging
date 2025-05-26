@@ -35,8 +35,8 @@ const default_viz_options = {
     upper: 0.020,
     legend_breaks: ['0.5%', '1.0%', '1.5%', '2.0%'],
     fill_palette: [
-      '#30123B','#4454C4','#4490FE','#1FC8DE','#29EFA2','#7DFF56','#C1F334',
-      '#F1CA3A','#FE922A'
+      '#352A87','#0E5FDB','#1283D4','#06A5C7','#33B7A0','#8ABE75','#D1BA58','#FBC831',
+      '#F9FB0E'
     ],
     legend_title: 'Estimated<br/>HIV Viraemia',
   },
@@ -48,8 +48,8 @@ const default_viz_options = {
     upper: 1.0,
     legend_breaks: ['<=70%', '80%', '90%', '100%'],
     fill_palette: [
-      '#440154','#482878','#3E4A89','#31688E','#26828E','#1F9E89','#35B779',
-      '#6DCD59','#B4DE2C'
+      '#B4DE2C', '#6DCD59', '#35B779', '#1F9E89', '#26828E', '#31688E', '#3E4A89',
+      '#482878', '#440154'
     ],
     legend_title: 'Estimated<br/>Viral Load<br/>Suppression'
   }
