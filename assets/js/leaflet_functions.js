@@ -23,7 +23,7 @@ function poly_tooltip(layer, ind_suffix = ''){
   const titleLabels = {
     gvhname: 'GVH: ',
     taname: '',
-    closest_facility_name: '',
+    catchment_name: '',
     survey_facility_name: '',
   }
   Object.entries(titleLabels).forEach(([key, label]) => {
@@ -62,7 +62,7 @@ function poly_tooltip(layer, ind_suffix = ''){
     if(props.pop_15to49 < LOW_POP_CUTOFF) {
       labs = [`<i>Population</i>: < ${cma(LOW_POP_CUTOFF)}`];
     } else {
-      labs.push(`<i>Population</i>: ${cma(props.pop_15to49)}`);
+      labs.push(`<i>Population (15 to 49)</i>: ${cma(props.pop_15to49)}`);
     }
   }
   inner_html += labs.join('<br/>');
@@ -79,8 +79,8 @@ function point_popup(layer){
     <i>Type:</i> ${props['facility_type']}<br/>
     <i>Location:</i> ${props['taname']} (${props['restype']})<br/>
     <i>Services:</i> ${props['health_service']}<br/>
-    <i>ART cohort (Q4 2023):</i> ${cma(props['art_out'])}<br/>
-    <i>Catchment population:</i> ${cma(props['pop_15to49'])}<br/>
+    <i>ART cohort (Q4 2024):</i> ${cma(props['art_cumulative'])}<br/>
+    <i>Catchment population (15 to 49):</i> ${cma(props['pop_15to49'])}<br/>
   `;
   return inner_html;
 }
@@ -373,8 +373,8 @@ function create_district_map(id, bounds, options) {
     new_geojson(bounds.ta, {...options, overlay: true})
   ]);
   base_layers['Facility catchment'] = L.layerGroup([
-    new_geojson(bounds.h3, {...options, interactive: false, ind_suffix: '_gcf'}),
-    new_geojson(bounds.closest_facilities, {...options, overlay: true, ind_suffix: '_gcf'})
+    new_geojson(bounds.h3, {...options, interactive: false, ind_suffix: '_facility'}),
+    new_geojson(bounds.facility_catchments, {...options, overlay: true, ind_suffix: '_facility'})
   ]);
 
   // Add layers that may not exist: survey facilities
@@ -397,7 +397,7 @@ function create_district_map(id, bounds, options) {
   }
   const catch_title = 'Facility catchment<br/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;boundaries';
   optional_layers[catch_title] = L.geoJSON(
-    bounds.closest_facilities, {
+    bounds.facility_catchments, {
       style: {opacity: 0.85, color: "#0000FF", dashArray: "5, 10", fillOpacity: 0},
       interactive: false,
       pane: 'shadowPane'
