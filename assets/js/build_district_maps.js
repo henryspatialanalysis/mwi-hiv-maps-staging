@@ -65,24 +65,3 @@ create_district_map('hiv-prevalence-map', boundaries, prevalence_options);
 
 const vls_options = {...default_viz_options.vls, ...viz_options.vls};
 create_district_map('viral-load-suppression-map', boundaries, vls_options);
-
-
-// Dynamically resize iframes ----------------------------------------------------------->
-
-function ta_iframe_loaded(){
-  console.log("Function fired!");
-  const iframe = document.getElementById('ta_iframe');
-  iframe.style.height = '';
-  iframe.style.height = iframe.contentWindow.document.body.scrollHeight + 'px';
-}
-
-function hf_iframe_loaded(){
-  const iframe = document.getElementById('hf_iframe');
-  iframe.style.height = '';
-  iframe.style.height = iframe.contentWindow.document.body.scrollHeight + 'px';
-}
-
-window.addEventListener('resize', function() {
-  ta_iframe_loaded();
-  hf_iframe_loaded();
-});

@@ -12,4 +12,18 @@
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
   <script src="https://unpkg.com/chroma-js@2.4.2/chroma.min.js"></script>
+  <!-- Dynamic iframe resizing -->
+  <script>
+    function iframe_loaded(id){
+      const iframe = document.getElementById(id);
+      if(iframe){
+        iframe.style.height = '';
+        iframe.style.height = iframe.contentWindow.document.body.scrollHeight + 'px';
+      }
+    }
+    window.addEventListener('resize', function() {
+      iframe_loaded('ta_iframe');
+      iframe_loaded('hf_iframe');
+    });
+  </script>
 </head>
