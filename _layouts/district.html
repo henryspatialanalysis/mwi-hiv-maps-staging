@@ -44,13 +44,30 @@
         <hr/>
 
         <h2>Traditional Authorities</h2>
-        <p>The following table lists HIV prevalence among 15 to 49-year olds and population across the same age range for all traditional authorities in {{page.title}}.</p>
-        <div id="traditional-authorities-table"></div>
+        <p class="paragraph-above-iframe">The following table lists HIV prevalence among 15 to 49-year olds and population across the same age range for all traditional authorities in {{page.title}}.</p>
+        <div id="traditional-authorities-table">
+          <iframe
+            id="ta_iframe"
+            class="dynamic-iframe"
+            scrolling="no"
+            onload="ta_iframe_loaded()"
+            src="./data/{{ page.title }}_tas.html"
+          ></iframe>
+        </div>
         <hr/>
 
         <h2>Health Facilities</h2>
-        <p>The following table lists health facilities offering ART services across {{page.title}}.</p>
-        <div id="health-facilities-table"></div>
+        <p class="paragraph-above-iframe">The following table lists health facilities offering ART services across {{page.title}}.</p>
+        <div id="health-facilities-table">
+          <iframe
+            id="hf_iframe"
+            class="dynamic-iframe"
+            scrolling="no"
+            onload="hf_iframe_loaded()"
+            src="./data/{{ page.title }}_facilities.html"
+          >
+          </iframe>
+        </div>
 
         <!-- End of page content -->
 

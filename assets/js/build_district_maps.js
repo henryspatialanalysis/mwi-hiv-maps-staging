@@ -67,16 +67,22 @@ const vls_options = {...default_viz_options.vls, ...viz_options.vls};
 create_district_map('viral-load-suppression-map', boundaries, vls_options);
 
 
-// Add tables to district pages --------------------------------------------------------->
+// Dynamically resize iframes ----------------------------------------------------------->
 
-function import_html_table(path, element_id){
-  fetch(path)
-    .then(response => response.text())
-    .then(data => {
-      const containerElement = document.getElementById(element_id);
-      containerElement.innerHTML = data;
-    });
+function ta_iframe_loaded(){
+  console.log("Function fired!");
+  const iframe = document.getElementById('ta_iframe');
+  iframe.style.height = '';
+  iframe.style.height = iframe.contentWindow.document.body.scrollHeight + 'px';
 }
 
-import_html_table('./data/' + district_name + '_tas.html', 'traditional-authorities-table');
-import_html_table('./data/' + district_name + '_facilities.html', 'health-facilities-table');
+function hf_iframe_loaded(){
+  const iframe = document.getElementById('hf_iframe');
+  iframe.style.height = '';
+  iframe.style.height = iframe.contentWindow.document.body.scrollHeight + 'px';
+}
+
+window.addEventListener('resize', function() {
+  ta_iframe_loaded();
+  hf_iframe_loaded();
+});
