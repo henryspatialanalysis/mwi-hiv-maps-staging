@@ -8,6 +8,9 @@ collections:
   districts:
     output: true
     permalink: /:title.html
+  district_maps:
+    output: true
+    permalink: /maps/:title/index.html
 
 # Build settings
 theme: minima
