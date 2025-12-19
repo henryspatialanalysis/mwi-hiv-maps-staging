@@ -1,0 +1,10 @@
+<!DOCTYPE html>
+<html lang="en">
+  {%- include head.html -%}
+  <body>
+    <div id="national-map" class="leaflet-map full-screen"></div>
+    <script src="{{ '/assets/js/leaflet_functions.js' | relative_url }}"></script>
+    <script src="{{ '/data/national.js' | relative_url }}"></script>
+    <script src="{{ '/assets/js/build_national_map.js' | relative_url }}"></script>
+  </body>
+</html>
