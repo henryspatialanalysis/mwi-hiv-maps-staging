@@ -11,6 +11,12 @@ collections:
   district_maps:
     output: true
     permalink: /maps/:title/index.html
+  prevalence_maps:
+    output: true
+    permalink: /prevalence/:title/index.html
+  vls_maps:
+    output: true
+    permalink: /vls/:title/index.html
 
 # Build settings
 theme: minima

@@ -1,0 +1,12 @@
+<!DOCTYPE html>
+<html lang="en">
+  {%- include head.html -%}
+  <body>
+    <div id="hiv-map" class="leaflet-map full-screen"></div>
+    <script src="{{ '/assets/js/leaflet_functions.js' | relative_url }}"></script>
+    <script src="{{ '/data' | relative_url }}/{{ page.title }}.js"></script>
+    <script>const district_name = "{{ page.title }}";</script>
+    <script src="{{ '/assets/js/build_prevalence_map_standalone.js' | relative_url }}"></script>
+  </body>
+
+</html>

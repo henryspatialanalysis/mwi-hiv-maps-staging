@@ -3,6 +3,19 @@
 
 @import "minima";
 
+// Add preferred font
+@import url('https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@300;400;500;600;700;800&display=swap');
+html, body {
+  font-family: "Nunito Sans", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif !important;
+  color: #4b4b4b !important;
+}
+*, *::before, *::after, h1, h2, h3, h4, h5, h6, p, span, a, li, blockquote, label, input,
+textarea, select, button {
+  font-family: inherit !important;
+  color: inherit !important;
+}
+
+
 // Site Banner Styles
 .site-banner {
   background-color: #990005;
