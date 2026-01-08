@@ -3,6 +3,25 @@
 <head>
 <meta charset="utf-8" />
 <title>reactable</title>
+<style>
+/* 1) Load Nunito Sans (Google Fonts) */
+@import url('https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@300;400;500;600;700;800&display=swap');
+/* 2) Set global font + text color */
+html, body {
+  font-family: "Nunito Sans", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif !important;
+  color: #4b4b4b !important;
+}
+/* 3) Ensure common text elements inherit (helps when themes set their own styles) */
+*,
+*::before,
+*::after,
+h1, h2, h3, h4, h5, h6,
+p, span, a, li, blockquote,
+label, input, textarea, select, button {
+  font-family: inherit !important;
+  color: inherit !important;
+}
+</style>
 <script>/**
  * core-js 2.6.11
  * https://github.com/zloirock/core-js
@@ -1244,9 +1263,9 @@ flex: 0 0 auto;
 </head>
 <body style="background-color: white;">
 <div id="htmlwidget_container">
-  <div class="reactable html-widget html-fill-item" id="htmlwidget-0f1ac8b052bbbe60b85f" style="width:auto;height:auto;"></div>
+  <div class="reactable html-widget html-fill-item" id="htmlwidget-35018a09407aa294e390" style="width:auto;height:auto;"></div>
 </div>
-<script type="application/json" data-for="htmlwidget-0f1ac8b052bbbe60b85f">{"x":{"tag":{"name":"Reactable","attribs":{"data":{"facility_name":["Alumenda Health Centre","Bereu Health Post","Chapananga Health Centre","Chikwawa District Hospital","Chipwaila Health Centre","Chithumba Health Centre","Dolo Health Centre","Gaga Health Centre","Gola Health Centre","Kakoma Health Centre","Kalulu Health Centre Chikwawa","Lengwe Health Centre","Makhwira Health Centre","Mapelera Health Centre","Mfera Health Centre","Misomali Health Centre","Mkumaniza Health Centre","Mwanza Clinic Area 3","Nchalo Health Centre","Ndakwera Health Centre","Ngabu Rural Hospital","Ngabu SDA Health Centre","St Montfort Hospital","Sucoma Clinic Illovo"],"Site_code":["ALMD","BUR","CPNG","CDHC","CPWL","CHEC","DOLO","GAGA","GOHP","KKMA","KLLU","LEGW","MKWR","MPLH","MFEL","MSML","MKUM","MZAC","NCHC","NDKH","NRH","NGSD","SMMH","SICM"],"facility_type":["Health centre","Health post","Health centre","District hospital","Health centre","Health centre","Health centre","Health centre","Health centre","Health centre","Health centre","Health centre","Health centre","Health centre","Health centre","Health centre","Health centre","Health centre","Health centre","Health centre","Rural / community hospital","Health centre","Other hospital","Health centre"],"taname":["Ngabu","Maseya","Chapananga","Kasisi","Ngabu","Chapananga","Ngabu","Chapananga","Chapananga","Chapananga","Lundu","Lundu","Makhwira","Makhwira","Katunga","Chapananga","Ngabu","Lundu","Lundu","Senior TA Ndakwela","Ngabu","Ngabu","Lundu","Lundu"],"restype":["Rural","Rural","Rural","Semi-urban","Rural","Rural","Rural","Rural","Rural","Rural","Rural","Rural","Rural","Rural","Rural","Rural","Rural","Rural","Rural","Rural","Rural","Rural","Rural","Rural"]},"columns":[{"id":"facility_name","name":"Health Facility","type":"character","align":"left"},{"id":"Site_code","name":"Code","type":"character","align":"center"},{"id":"facility_type","name":"Type","type":"character","align":"center"},{"id":"taname","name":"Traditional Authority","type":"character","align":"center"},{"id":"restype","name":"Setting","type":"character","align":"center"}],"filterable":true,"searchable":true,"defaultPageSize":15,"dataKey":"d05f1ca46030a59db0f4abf630d0ec47","static":false},"children":[]},"class":"reactR_markup"},"evals":[],"jsHooks":[]}</script>
-<script type="application/htmlwidget-sizing" data-for="htmlwidget-0f1ac8b052bbbe60b85f">{"viewer":{"width":"auto","height":"auto","padding":15,"fill":true},"browser":{"width":"auto","height":"auto","padding":40,"fill":false}}</script>
+<script type="application/json" data-for="htmlwidget-35018a09407aa294e390">{"x":{"tag":{"name":"Reactable","attribs":{"data":{"facility_name":["Alumenda Health Centre","Bereu Health Post","Chapananga Health Centre","Chikwawa District Hospital","Chipwaila Health Centre","Chithumba Health Centre","Dolo Health Centre","Gaga Health Centre","Gola Health Centre","Kakoma Health Centre","Kalulu Health Centre Chikwawa","Lengwe Health Centre","Makhwira Health Centre","Mapelera Health Centre","Mfera Health Centre","Misomali Health Centre","Mkumaniza Health Centre","Mwanza Clinic Area 3","Nchalo Health Centre","Ndakwera Health Centre","Ngabu Rural Hospital","Ngabu SDA Health Centre","St Montfort Hospital","Sucoma Clinic Illovo"],"Site_code":["ALMD","BUR","CPNG","CDHC","CPWL","CHEC","DOLO","GAGA","GOHP","KKMA","KLLU","LEGW","MKWR","MPLH","MFEL","MSML","MKUM","MZAC","NCHC","NDKH","NRH","NGSD","SMMH","SICM"],"facility_type":["Health centre","Health post","Health centre","District hospital","Health centre","Health centre","Health centre","Health centre","Health centre","Health centre","Health centre","Health centre","Health centre","Health centre","Health centre","Health centre","Health centre","Health centre","Health centre","Health centre","Rural / community hospital","Health centre","Other hospital","Health centre"],"taname":["Ngabu","Maseya","Chapananga","Kasisi","Ngabu","Chapananga","Ngabu","Chapananga","Chapananga","Chapananga","Lundu","Lundu","Makhwira","Makhwira","Katunga","Chapananga","Ngabu","Lundu","Lundu","Senior TA Ndakwela","Ngabu","Ngabu","Lundu","Lundu"],"restype":["Rural","Rural","Rural","Semi-urban","Rural","Rural","Rural","Rural","Rural","Rural","Rural","Rural","Rural","Rural","Rural","Rural","Rural","Rural","Rural","Rural","Rural","Rural","Rural","Rural"]},"columns":[{"id":"facility_name","name":"Health Facility","type":"character","align":"left"},{"id":"Site_code","name":"Code","type":"character","align":"center"},{"id":"facility_type","name":"Type","type":"character","align":"center"},{"id":"taname","name":"Traditional Authority","type":"character","align":"center"},{"id":"restype","name":"Setting","type":"character","align":"center"}],"filterable":true,"searchable":true,"defaultPageSize":15,"dataKey":"d05f1ca46030a59db0f4abf630d0ec47","static":false},"children":[]},"class":"reactR_markup"},"evals":[],"jsHooks":[]}</script>
+<script type="application/htmlwidget-sizing" data-for="htmlwidget-35018a09407aa294e390">{"viewer":{"width":"auto","height":"auto","padding":15,"fill":true},"browser":{"width":"auto","height":"auto","padding":0,"fill":false}}</script>
 </body>
 </html>

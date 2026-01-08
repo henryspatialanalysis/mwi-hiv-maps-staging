@@ -3,6 +3,25 @@
 <head>
 <meta charset="utf-8" />
 <title>reactable</title>
+<style>
+/* 1) Load Nunito Sans (Google Fonts) */
+@import url('https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@300;400;500;600;700;800&display=swap');
+/* 2) Set global font + text color */
+html, body {
+  font-family: "Nunito Sans", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif !important;
+  color: #4b4b4b !important;
+}
+/* 3) Ensure common text elements inherit (helps when themes set their own styles) */
+*,
+*::before,
+*::after,
+h1, h2, h3, h4, h5, h6,
+p, span, a, li, blockquote,
+label, input, textarea, select, button {
+  font-family: inherit !important;
+  color: inherit !important;
+}
+</style>
 <script>/**
  * core-js 2.6.11
  * https://github.com/zloirock/core-js
@@ -1244,9 +1263,9 @@ flex: 0 0 auto;
 </head>
 <body style="background-color: white;">
 <div id="htmlwidget_container">
-  <div class="reactable html-widget html-fill-item" id="htmlwidget-87292f1453dca25b6c22" style="width:auto;height:auto;"></div>
+  <div class="reactable html-widget html-fill-item" id="htmlwidget-1baeba3b926aeb416407" style="width:auto;height:auto;"></div>
 </div>
-<script type="application/json" data-for="htmlwidget-87292f1453dca25b6c22">{"x":{"tag":{"name":"Reactable","attribs":{"data":{"facility_name":["Anchor Farm Health Centre","Bua Dispensary","Chamwabvi Dispensary","Chulu Health Centre","Dwangwa Health Centre","Gogode Dispensary","Kakwale Health Centre","Kaluluma Rural Hospital","Kamboni Health Centre","Kapelula Health Centre","Kasalika Health Centre","Kasungu District Hospital","Kawamba Health Centre","Khola Health Centre","Linyangwa Health Centre","Livwezi Health Centre","Lodjwa Health Centre","Mdunga Health Centre","Mkhota Rural Growth Health Centre","Mnyanja Health Centre","Mpepa Health Centre","Mtunthama Health Centre","Mziza Health Centre","Nkhamenya Community Hospital","Ofesi Health Centre","Santhe Health Centre","Simulemba Health Centre","St Andrews Clinic","St Augustine Health Centre","St Faith Anglican Clinic","Wimbe Health Centre"],"Site_code":["ANCH","BUAD","CMWV","CULU","DGWA","GGDE","KAHC","KLRH","KBNI","KPLA","KSRK","KDH","KWBA","KHOL","LNYG","LQVW","LJWA","MDGA","NRGC","MNYJ","MPPA","MTHC","MZAH","NCMH","OFD","STHC","SMHC","SAC","STAQ","FAIT","WHC"],"facility_type":["Health centre","Dispensary","Dispensary","Health centre","Health centre","Health centre","Health centre","Rural / community hospital","Health centre","Health centre","Health centre","District hospital","Health centre","Health centre","Health centre","Health centre","Health centre","Health centre","Health centre","Health centre","Health centre","Health centre","Health centre","Other hospital","Health centre","Health centre","Health centre","Special / other site","Health centre","Health centre","Health centre"],"taname":["Chaima","Njombwa","Chilowamatambe","Chulu","Senior TA Mphomwa","Kaomba","Kaluluma","Kaluluma","Kawamba","Kapelula","Kaomba","Kaomba","Kawamba","Chidzuma","Lukwa","Wimbe","Senior TA Chisikwa","Senior TA Mdunga","Santhe","Senior TA M'nyanja","Senior TA Chisinga","Wimbe","Njombwa","Kaluluma","Senior TA M'nyanja","Santhe","Simlemba","Wimbe","Wimbe","Wimbe","Wimbe"],"restype":["Rural","Rural","Rural","Rural","Rural","Rural","Rural","Rural","Rural","Rural","Rural","Semi-urban","Rural","Rural","Rural","Rural","Rural","Rural","Rural","Rural","Rural","Rural","Rural","Rural","Rural","Rural","Rural","Semi-urban","Rural","Rural","Rural"]},"columns":[{"id":"facility_name","name":"Health Facility","type":"character","align":"left"},{"id":"Site_code","name":"Code","type":"character","align":"center"},{"id":"facility_type","name":"Type","type":"character","align":"center"},{"id":"taname","name":"Traditional Authority","type":"character","align":"center"},{"id":"restype","name":"Setting","type":"character","align":"center"}],"filterable":true,"searchable":true,"defaultPageSize":15,"dataKey":"a65f710b516a09290595eb476727dc67","static":false},"children":[]},"class":"reactR_markup"},"evals":[],"jsHooks":[]}</script>
-<script type="application/htmlwidget-sizing" data-for="htmlwidget-87292f1453dca25b6c22">{"viewer":{"width":"auto","height":"auto","padding":15,"fill":true},"browser":{"width":"auto","height":"auto","padding":40,"fill":false}}</script>
+<script type="application/json" data-for="htmlwidget-1baeba3b926aeb416407">{"x":{"tag":{"name":"Reactable","attribs":{"data":{"facility_name":["Anchor Farm Health Centre","Bua Dispensary","Chamwabvi Dispensary","Chulu Health Centre","Dwangwa Health Centre","Gogode Dispensary","Kakwale Health Centre","Kaluluma Rural Hospital","Kamboni Health Centre","Kapelula Health Centre","Kasalika Health Centre","Kasungu District Hospital","Kawamba Health Centre","Khola Health Centre","Linyangwa Health Centre","Livwezi Health Centre","Lodjwa Health Centre","Mdunga Health Centre","Mkhota Rural Growth Health Centre","Mnyanja Health Centre","Mpepa Health Centre","Mtunthama Health Centre","Mziza Health Centre","Nkhamenya Community Hospital","Ofesi Health Centre","Santhe Health Centre","Simulemba Health Centre","St Andrews Clinic","St Augustine Health Centre","St Faith Anglican Clinic","Wimbe Health Centre"],"Site_code":["ANCH","BUAD","CMWV","CULU","DGWA","GGDE","KAHC","KLRH","KBNI","KPLA","KSRK","KDH","KWBA","KHOL","LNYG","LQVW","LJWA","MDGA","NRGC","MNYJ","MPPA","MTHC","MZAH","NCMH","OFD","STHC","SMHC","SAC","STAQ","FAIT","WHC"],"facility_type":["Health centre","Dispensary","Dispensary","Health centre","Health centre","Health centre","Health centre","Rural / community hospital","Health centre","Health centre","Health centre","District hospital","Health centre","Health centre","Health centre","Health centre","Health centre","Health centre","Health centre","Health centre","Health centre","Health centre","Health centre","Other hospital","Health centre","Health centre","Health centre","Special / other site","Health centre","Health centre","Health centre"],"taname":["Chaima","Njombwa","Chilowamatambe","Chulu","Senior TA Mphomwa","Kaomba","Kaluluma","Kaluluma","Kawamba","Kapelula","Kaomba","Kaomba","Kawamba","Chidzuma","Lukwa","Wimbe","Senior TA Chisikwa","Senior TA Mdunga","Santhe","Senior TA M'nyanja","Senior TA Chisinga","Wimbe","Njombwa","Kaluluma","Senior TA M'nyanja","Santhe","Simlemba","Wimbe","Wimbe","Wimbe","Wimbe"],"restype":["Rural","Rural","Rural","Rural","Rural","Rural","Rural","Rural","Rural","Rural","Rural","Semi-urban","Rural","Rural","Rural","Rural","Rural","Rural","Rural","Rural","Rural","Rural","Rural","Rural","Rural","Rural","Rural","Semi-urban","Rural","Rural","Rural"]},"columns":[{"id":"facility_name","name":"Health Facility","type":"character","align":"left"},{"id":"Site_code","name":"Code","type":"character","align":"center"},{"id":"facility_type","name":"Type","type":"character","align":"center"},{"id":"taname","name":"Traditional Authority","type":"character","align":"center"},{"id":"restype","name":"Setting","type":"character","align":"center"}],"filterable":true,"searchable":true,"defaultPageSize":15,"dataKey":"a65f710b516a09290595eb476727dc67","static":false},"children":[]},"class":"reactR_markup"},"evals":[],"jsHooks":[]}</script>
+<script type="application/htmlwidget-sizing" data-for="htmlwidget-1baeba3b926aeb416407">{"viewer":{"width":"auto","height":"auto","padding":15,"fill":true},"browser":{"width":"auto","height":"auto","padding":0,"fill":false}}</script>
 </body>
 </html>
