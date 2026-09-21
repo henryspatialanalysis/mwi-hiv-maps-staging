@@ -29,10 +29,10 @@ CI builds with `JEKYLL_ENV=production` and `--baseurl` set from the Pages config
 - **Templates and JS** (`_layouts/`, `_includes/`, `assets/`) are hand-written and are
   what you normally edit.
 - **`data/`** is generated upstream by an R pipeline (see below) and committed as-is. Do
-  not hand-edit it. `data/<District>.js` (~2 MB each) declares two globals, `viz_options`
-  and `boundaries`; `data/national.js` declares `national` and `districts`.
-  `data/<District>_tas.html` and `data/<District>_facilities.html` are self-contained
-  reactable widgets embedded as iframes.
+  not hand-edit it. `data/<District>.js` declares two globals, `viz_options` and
+  `boundaries`; `data/national.js` declares `national` and `districts`.
+  `data/<District>_tas.html` and `data/<District>_facilities.html` are reactable widgets
+  embedded as iframes; they load their JS and CSS from the shared `data/reactable_lib/`.
 
 ### Upstream: where `data/` comes from
 
@@ -46,38 +46,45 @@ orderly::orderly_run("split_model_results")
 ```
 
 Outputs land in `../respond-map-prep/archive/split_model_results/<timestamp-id>/artefacts/`.
-Publishing is a manual copy of `national.js`, `<District>.js`, `<District>_tas.html`, and
-`<District>_facilities.html` from that folder into this repo's `data/`, then a commit. The
-`*_tas.csv`, `*_facilities.csv`, and `aggregate_summary_table.csv` artefacts are not used
-here. There is no script for the copy step.
+Publish with `make sync SRC="<that artefacts folder>"`, which replaces everything in
+`data/` (`national.js`, `<District>.js`, the two table HTML files per district and
+`reactable_lib/`), then commit. The `*_tas.csv`, `*_facilities.csv`, and
+`aggregate_summary_table.csv` artefacts are not used here.
 
 Things the R script decides that this site's JS depends on:
 
 - **Column abbreviation.** Model columns `prev15to49_mean` etc. are renamed to
-  `pr_m`/`vr_m`/`vl_m` (+ `_l`/`_u`) and rounded to 3 dp; populations are rounded to
-  integers; coordinates are truncated to `OUTPUT_PRECISION = 1e4`.
-- **Aggregation suffixes.** `_ta` comes from pre-aggregated area estimates; `_gvh`,
-  `_facility`, `_scf` are population-weighted means of H3 cells computed in the script.
-  Adding a new resolution level means adding an entry to `aggregation_metadata` there
-  and a matching layer in `create_district_map()` here.
-- **Per-district `viz_options`.** `settings_from_cutoffs()` sets `lower`/`upper`/
-  `legend_breaks` from the observed range of H3 means, and `pop_cutoff_high` from the 90th
+  `pr_m`/`vr_m`/`vl_m` (+ `_l`/`_u`); `pr`/`vl` are rounded to 3 dp and `vr` to 4 dp;
+  populations are rounded to integers; GeoJSON coordinates have 4 dp.
+- **Only the properties this site reads are written.** Polygon layers carry a name
+  (`taname`, `gvhname`, `catchment_name`, `survey_facility_name`), `pop_15to49` and the
+  indicators; `district` has no properties; facility points carry `facility_name`,
+  `facility_type`, `taname`, `restype`, `services`, `art_cumulative` and (for included
+  facilities) `pop_15to49`. Reading a new column means adding it on the R side too.
+- **The H3 layer is not GeoJSON.** `boundaries.h3` is `{ids: [...], props: {col: [...]}}`:
+  H3 cell ids plus one array per column. `h3_to_geojson()` in `leaflet_functions.js`
+  builds the hexagons with h3-js (loaded in `head.html`) once per page, and
+  `feature_props()` looks a feature's values up by its row index `i`. Missing values are
+  `null` and are drawn in `NA_COLOR`.
+- **Aggregation suffixes.** `_ta` comes from the model's own area estimates; `_gvh`,
+  `_facility`, `_scf` are weighted means of H3 cells computed in the script
+  (population-weighted for prevalence and viraemia, PLHIV-weighted for VLS). Only means
+  are emitted for suffixed columns. Adding a new resolution level means adding an entry
+  to `aggregation_specs` there and a matching layer in `create_district_map()` here.
+- **Per-district `viz_options`.** `settings_from_values()` picks "pretty" breaks over
+  the range of H3 means and sets `lower`/`upper` to the first and last break, so the
+  colour domain and `legend_breaks` always coincide; `pop_cutoff_high` is the 90th
   percentile of H3 `pop_15to49`. `pop_cutoff_low`, palettes, and titles are not emitted
   and fall through to `default_viz_options` in `assets/js/viz_defaults.js`.
-- **Reactable post-processing.** The script injects the Nunito Sans `<style>` block and
-  zeroes widget padding so the iframes match `assets/main.scss`; font changes must be
-  made in both places.
+- **Reactable styling.** The script prepends a Nunito Sans `<style>` block to each
+  widget and zeroes its body padding so the iframes match `assets/main.scss`; font
+  changes must be made in both places.
 - **File naming.** `name_to_url()` replaces spaces with hyphens; current district names
   contain none, so file stems equal the collection stub titles (e.g. `Nkhatabay`).
 - **Model year** is pinned by `MODEL_RESULTS_YEAR` (currently 2023).
 
-Re-running the task produces byte-level diffs in every file even when the data are
-unchanged (GeoJSON `"name": "file<hex>"` from `tempfile()`, and htmlwidget element ids).
-Do not read such diffs as data changes.
-
-The sibling repo also contains a `build_website` task and README notes about a
-blogdown/Hugo site and a `RESPOND` public repo. That is the legacy publishing path and
-is not used by this Jekyll site.
+Outputs are deterministic (no GeoJSON layer names, fixed reactable element ids), so a
+diff in `data/` after `make sync` reflects a real change in the data or the script.
 
 ### Page generation: one stub per district per collection
 
@@ -105,8 +112,8 @@ pages such as `/about/`.
 Every map page loads scripts in this order, all as plain globals (no modules, no bundler):
 
 1. `assets/js/leaflet_functions.js` — shared library: `create_district_map()`,
-   `new_geojson()`, `prepare_legend()`, tooltip/popup builders, basemap helpers,
-   `lazy_layer_group()`.
+   `new_geojson()`, `h3_to_geojson()`, `feature_props()`, `prepare_legend()`,
+   tooltip/popup builders, basemap helpers, `lazy_layer_group()`.
 2. `assets/js/viz_defaults.js` — `default_viz_options` (palettes, breaks, titles per
    indicator) plus the `if(typeof viz_options === 'undefined') var viz_options = {}`
    guard, which exists because the data file may or may not define `viz_options`.
@@ -119,7 +126,7 @@ The national map (`build_national_map.js`) does not load `viz_defaults.js`; it c
 own flat `viz_options`.
 
 Leaflet 1.9.4, MapLibre GL 5.x, the `@maplibre/maplibre-gl-leaflet` plugin, chroma.js
-2.4.2 and the Nunito Sans font are loaded from unpkg / Google Fonts in
+2.4.2, h3-js 4.5.0 and the Nunito Sans font are loaded from unpkg / Google Fonts in
 `_includes/head.html`, all version-pinned.
 
 ### Basemap
@@ -154,14 +161,15 @@ instances that parse their GeoJSON the first time they are selected in the layer
 ### Data contract expected by `create_district_map()`
 
 `boundaries` keys: `district`, `h3`, `gvh`, `ta`, `facility_catchments`,
-`facility_points`, and optionally `survey_facilities` and `dropped_facility_points`.
-Indicator columns are `<ind>_<stat><suffix>` where `ind` ∈ `pr` (prevalence), `vr`
-(viraemia), `vl` (VLS); `stat` ∈ `m`/`l`/`u` (mean, lower, upper); and `suffix` is
-`''` (native resolution), `_gvh`, `_ta`, `_facility`, or `_scf`. The toggleable
-"resolution" layers are all drawn from the `h3` grid recoloured by a different suffix,
-with the coarser polygon layer added as a non-filled overlay for outlines. Fill opacity
-is stepped by `pop_15to49` against `pop_cutoff_low`/`pop_cutoff_high`, and tooltips
-censor indicators where population is under 50.
+`facility_points`, and optionally `survey_facilities` and `dropped_facility_points`
+(absent when the district has none). All are GeoJSON FeatureCollections except `h3`
+(see above). Indicator columns are `<ind>_<stat><suffix>` where `ind` ∈ `pr`
+(prevalence), `vr` (viraemia), `vl` (VLS); `stat` ∈ `m`/`l`/`u` (mean, lower, upper); and
+`suffix` is `''` (native resolution), `_gvh`, `_ta`, `_facility`, or `_scf`. The
+toggleable "resolution" layers are all drawn from the `h3` hexagons recoloured by a
+different suffix, with the coarser polygon layer added as a non-filled overlay for
+outlines. Fill opacity is stepped by `pop_15to49` against `pop_cutoff_low`/
+`pop_cutoff_high`, and tooltips censor indicators where population is under 50.
 
 ### Styling
 
