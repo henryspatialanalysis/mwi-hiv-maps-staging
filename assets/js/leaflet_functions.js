@@ -393,20 +393,8 @@ function lazy_layer_group(build){
 
 // Assumes the div with id map already exists
 function create_district_map(id, bounds, options) {
-  const default_options = {
-    use_col: 'pr_m',
-    lower: 0.0,
-    upper: 0.15,
-    fill_palette: [
-      '#0D0887FF','#3E049CFF','#6300A7FF','#8707A6FF','#A62098FF','#C03A83FF','#D5546EFF',
-      '#E76F5AFF','#F58C46FF','#FDAD32FF','#FCD225FF','#F0F921FF'
-    ],
-    legend_breaks: ['0%', '5%', '10%', '15%+'],
-    legend_title: 'Estimated<br/>HIV Prevalence',
-    pop_cutoff_low: 50,
-    pop_cutoff_high: 200,
-    zoom_min: 10
-  };
+  // Indicator defaults come from viz_defaults.js, which must be loaded before this call
+  const default_options = {...default_viz_options.prevalence, zoom_min: 10};
   options = {...default_options, ...options};
 
   // Create map. The canvas renderer avoids one SVG <path> per H3 cell, which for the
