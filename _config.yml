@@ -1,8 +1,8 @@
 title: Malawi HIV Maps
 email: ""
 description: "Interactive maps of HIV indicators across Malawi's districts, produced by the RESPOND project."
-baseurl: "" # the subpath of your site, e.g. /blog
-url: "https://henryspatialanalysis.github.io/mwi-hiv-maps-staging/"
+baseurl: "/mwi-hiv-maps-staging" # the subpath of your site, e.g. /blog
+url: "https://henryspatialanalysis.github.io"
 
 collections:
   districts:
@@ -22,6 +22,7 @@ collections:
 theme: minima
 plugins:
   - jekyll-feed
+  - jekyll-seo-tag
 
 # Exclude from processing:
 exclude:

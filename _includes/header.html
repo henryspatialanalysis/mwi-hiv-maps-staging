@@ -1,14 +1,14 @@
 <header class="site-banner">
   <div class="banner-container">
     <div class="banner-left">
-      <a href="{{ site.baseurl }}/" class="logo-link">
+      <a href="{{ '/' | relative_url }}" class="logo-link">
         <img
           src="{{ '/assets/images/mwi_coat_of_arms.svg' | relative_url }}"
           alt="Malawi Coat of Arms" class="site-logo" width="70" height="72"
         >
       </a>
       <h1 class="site-title">
-        <a href="{{ site.baseurl }}/">Malawi HIV Maps</a>
+        <a href="{{ '/' | relative_url }}">Malawi HIV Maps</a>
       </h1>
     </div>
 
@@ -21,7 +21,7 @@
         <ul class="dropdown-menu" aria-hidden="true">
           {% for district_page in site.districts %}
           <li>
-            <a href="./{{ district_page.title }}.html">{{ district_page.title }}</a>
+            <a href="{{ district_page.url | relative_url }}">{{ district_page.title }}</a>
           </li>
           {% endfor %}
         </ul>
