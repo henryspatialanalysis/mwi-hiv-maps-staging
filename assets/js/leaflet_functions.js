@@ -259,7 +259,11 @@ function new_geojson(data, options){
       });
       layer.bringToFront();
     });
-      layer.on('mouseout', () => layer.setStyle(style_fun(layer.feature)));
+      let base_style = null;
+      layer.on('mouseout', () => {
+        if(base_style === null) base_style = style_fun(layer.feature);
+        layer.setStyle(base_style);
+      });
     };
   }
   let geojsonLayer = L
@@ -370,6 +374,21 @@ function add_basemap(map, options){
   });
 }
 
+// Helper: a layer group that builds its contents on first use ------------------------->
+
+// `build` returns an array of Leaflet layers. It runs the first time the group is added
+// to a map (for example, when its radio button is selected in the layer control).
+function lazy_layer_group(build){
+  const group = L.layerGroup();
+  let built = false;
+  group.on('add', () => {
+    if(built) return;
+    built = true;
+    build().forEach((layer) => group.addLayer(layer));
+  });
+  return group;
+}
+
 // Template to create a leaflet map ----------------------------------------------------->
 
 // Assumes the div with id map already exists
@@ -390,8 +409,9 @@ function create_district_map(id, bounds, options) {
   };
   options = {...default_options, ...options};
 
-  // Create map
-  const map = L.map(id, {zoomSnap: 0.2});
+  // Create map. The canvas renderer avoids one SVG <path> per H3 cell, which for the
+  // largest districts adds up to tens of thousands of DOM nodes per map.
+  const map = L.map(id, {zoomSnap: 0.2, maxZoom: 18, preferCanvas: true});
   const bounds_keys = Object.keys(bounds);
 
   // Add basemap
@@ -410,25 +430,27 @@ function create_district_map(id, bounds, options) {
     map.setView(map.getCenter(), options.zoom_min);
   }
 
-  // Create all toggleable layers
+  // Create all toggleable resolution layers. Only the initially visible layer is built
+  // now; the others are layer groups that build their contents the first time they are
+  // selected in the layer control.
   var base_layers = {};
   base_layers['High resolution'] = new_geojson(bounds.h3, {...options, weight: 0.15}).addTo(map);
-  base_layers['Group village head'] = L.layerGroup([
+  base_layers['Group village head'] = lazy_layer_group(() => [
     new_geojson(bounds.h3, {...options, interactive: false, ind_suffix: '_gvh'}),
     new_geojson(bounds.gvh, {...options, overlay: true, ind_suffix: '_gvh'})
   ]);
-  base_layers['Traditional authority'] = L.layerGroup([
+  base_layers['Traditional authority'] = lazy_layer_group(() => [
     new_geojson(bounds.h3, {...options, interactive: false, ind_suffix: '_ta'}),
     new_geojson(bounds.ta, {...options, overlay: true})
   ]);
-  base_layers['Facility catchment'] = L.layerGroup([
+  base_layers['Facility catchment'] = lazy_layer_group(() => [
     new_geojson(bounds.h3, {...options, interactive: false, ind_suffix: '_facility'}),
     new_geojson(bounds.facility_catchments, {...options, overlay: true, ind_suffix: '_facility'})
   ]);
 
   // Add layers that may not exist: survey facilities
   if(bounds_keys.includes('survey_facilities')){
-    base_layers['Survey facilities'] = L.layerGroup([
+    base_layers['Survey facilities'] = lazy_layer_group(() => [
       new_geojson(bounds.h3, {...options, interactive: false, ind_suffix: '_scf'}),
       new_geojson(bounds.survey_facilities, {...options, overlay: true, ind_suffix: '_scf'})
     ]);
