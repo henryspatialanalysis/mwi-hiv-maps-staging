@@ -33,8 +33,8 @@ const national_map = L
   .map('national-map', {zoomSnap: 0.2})
   .setView([-13.2543, 33.9022], 6.6);
 
-// Add tile layers
-add_national_tile_layers(national_map);
+// Add basemap
+add_basemap(national_map);
 
 // Add district boundaries
 const district_layer = new_geojson(districts, {...viz_options, tooltip: false});

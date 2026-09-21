@@ -18,3 +18,13 @@
     margin: 0 !important;
     z-index: 1000;
 }
+
+/* MapLibre GL basemap layers never intercept pointer events. The labels overlay lives in
+   the `basemapLabels` pane (z-index 450, between overlayPane and shadowPane), which
+   add_basemap() also sets to pointer-events: none, so hover and click reach the data. */
+.leaflet-gl-layer,
+.leaflet-gl-layer .maplibregl-canvas-container,
+.leaflet-gl-layer canvas,
+.leaflet-pane.leaflet-basemapLabels-pane {
+    pointer-events: none !important;
+}

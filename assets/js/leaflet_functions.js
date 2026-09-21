@@ -274,51 +274,100 @@ function new_geojson(data, options){
 }
 
 
-// Helper function to create tile layers for Leaflet ------------------------------------>
+// Basemap: OpenFreeMap vector tiles rendered by MapLibre GL inside Leaflet ------------->
 
-function new_tile(url, options){
-  const default_options = {
-    attribution: '',
-    subdomains: 'abcd',
-    maxzoom: 20,
-    pane: 'tilePane'
+const BASEMAP_STYLE_URL = 'https://tiles.openfreemap.org/styles/positron';
+const BASEMAP_ATTRIBUTION = (
+  '<a href="https://openfreemap.org">OpenFreeMap</a> ' +
+  '&copy; <a href="https://www.openmaptiles.org/">OpenMapTiles</a>, ' +
+  'data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+);
+
+// The style JSON is fetched once per page and shared by every map on it
+let basemap_style_promise = null;
+function get_basemap_style(){
+  if(basemap_style_promise === null){
+    basemap_style_promise = fetch(BASEMAP_STYLE_URL).then((resp) => resp.json());
+  }
+  return basemap_style_promise;
+}
+
+// Style layers drawn *above* the data: place labels, administrative boundaries, major
+// roads and railways. Everything else (land, water, buildings, minor roads) is drawn
+// beneath the data.
+function is_overlay_style_layer(layer){
+  if(layer.type === 'symbol') return true;
+  if(layer.type !== 'line') return false;
+  const source_layer = layer['source-layer'];
+  if(source_layer === 'boundary') return true;
+  if(source_layer === 'transportation'){
+    return /^(highway_(motorway|major)|railway|tunnel_motorway)/.test(layer.id);
+  }
+  return false;
+}
+
+// Split one MapLibre style into a base style and an overlay style. Both share the same
+// sources, glyphs and sprite, so tiles are fetched once and served from cache after.
+function split_basemap_style(style){
+  return {
+    base: {...style, layers: style.layers.filter((l) => !is_overlay_style_layer(l))},
+    overlay: {...style, layers: style.layers.filter(is_overlay_style_layer)}
   };
+}
+
+// Fallback for browsers without WebGL (MapLibre needs it): plain OpenStreetMap raster
+// tiles beneath the data, with no labels overlay.
+function add_raster_fallback(map){
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 19,
+    pane: 'tilePane',
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+  }).addTo(map);
+}
+
+function webgl_available(){
+  try {
+    const canvas = document.createElement('canvas');
+    return !!(canvas.getContext('webgl2') || canvas.getContext('webgl'));
+  } catch(err) {
+    return false;
+  }
+}
+
+// Add the basemap to a Leaflet map. With `labels_above` (the default), labels, borders
+// and major roads are drawn in a dedicated pane that sits just above the data in
+// overlayPane and that never intercepts pointer events, so tooltips keep working.
+function add_basemap(map, options){
+  const default_options = {labels_above: true};
   options = {...default_options, ...options};
-  return L.tileLayer(url, options);
-}
-
-function add_tile_layers(map){
-  new_tile(
-    'https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}{r}.png',
-    {
-      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a>, ' +
-        '<a href="https://carto.com/attributions">CARTO</a>, ' +
-        '<a href="https://www.stadiamaps.com/">Stadia</a>'
+  if(!webgl_available()){
+    console.warn('WebGL unavailable; using OpenStreetMap raster tiles instead.');
+    add_raster_fallback(map);
+    return;
+  }
+  get_basemap_style().then((style) => {
+    const split = split_basemap_style(style);
+    L.maplibreGL({
+      style: split.base,
+      pane: 'tilePane',
+      attributionControl: {customAttribution: BASEMAP_ATTRIBUTION}
+    }).addTo(map);
+    if(options.labels_above){
+      if(!map.getPane('basemapLabels')){
+        const pane = map.createPane('basemapLabels');
+        pane.style.zIndex = 450;
+        pane.style.pointerEvents = 'none';
+      }
+      L.maplibreGL({
+        style: split.overlay,
+        pane: 'basemapLabels',
+        attributionControl: false
+      }).addTo(map);
     }
-  ).addTo(map);
-  new_tile(
-    'https://tiles.stadiamaps.com/tiles/stamen_toner_lines/{z}/{x}/{y}{r}.png',
-    {subdomains: '', pane: 'shadowPane'}
-  ).addTo(map);
-  new_tile(
-    'https://{s}.basemaps.cartocdn.com/light_only_labels/{z}/{x}/{y}{r}.png',
-    {pane: 'shadowPane'}
-  ).addTo(map);
-}
-
-function add_national_tile_layers(map){
-  new_tile(
-    'https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}{r}.png',
-    {
-      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a>, ' +
-        '<a href="https://carto.com/attributions">CARTO</a>, ' +
-        '<a href="https://www.stadiamaps.com/">Stadia</a>'
-    }
-  ).addTo(national_map);
-  new_tile(
-    'https://{s}.basemaps.cartocdn.com/light_only_labels/{z}/{x}/{y}{r}.png',
-    {pane: 'shadowPane'}
-  ).addTo(map);
+  }).catch((err) => {
+    console.warn('Could not load the basemap; using OpenStreetMap raster tiles instead.', err);
+    add_raster_fallback(map);
+  });
 }
 
 // Template to create a leaflet map ----------------------------------------------------->
@@ -345,8 +394,8 @@ function create_district_map(id, bounds, options) {
   const map = L.map(id, {zoomSnap: 0.2});
   const bounds_keys = Object.keys(bounds);
 
-  // Add base layers
-  add_tile_layers(map);
+  // Add basemap
+  add_basemap(map);
 
   // Add district boundaries
   const district_layer = L.geoJSON(bounds.district, {
