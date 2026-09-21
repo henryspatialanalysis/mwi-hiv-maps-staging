@@ -4,16 +4,50 @@ function cma(outcome) {
   const rounded = Math.round(outcome/10) * 10;
   return rounded.toLocaleString(undefined, {maximumFractionDigits: 10});
 }
-// Create percentage strings
-function pct(outcome, acc = 0.1, suffix = true) {
+// Create percentage strings with `decimals` digits after the point
+function pct(outcome, decimals = 1, suffix = true) {
   const suffixMark = suffix ? "%" : "";
-  return (outcome * 100).toFixed(acc) + suffixMark;
+  return (outcome * 100).toFixed(decimals) + suffixMark;
+}
+
+// Feature properties ------------------------------------------------------------------->
+
+// Polygon layers carry their properties on each GeoJSON feature. The H3 layer instead
+// stores one array per column (`props`, from data/<District>.js) and each feature holds
+// only its row index `i`. This returns a plain {column: value} object either way.
+function feature_props(feature, props){
+  if(!props) return feature.properties;
+  const i = feature.properties.i;
+  const out = {};
+  for(const [col, values] of Object.entries(props)) out[col] = values[i];
+  return out;
+}
+
+// Missing values arrive as null (the R side writes NA as null)
+function is_missing(value){
+  return value === null || value === undefined || Number.isNaN(value);
+}
+const NA_COLOR = '#bbbbbb';
+
+// Build hexagon polygons for the H3 layer from its cell ids, using h3-js. The result is
+// cached on the data object so the three maps on a district page share one copy.
+function h3_to_geojson(h3_data){
+  if(h3_data.geojson) return h3_data.geojson;
+  h3_data.geojson = {
+    type: 'FeatureCollection',
+    features: h3_data.ids.map((id, i) => ({
+      type: 'Feature',
+      properties: {i: i},
+      geometry: {type: 'Polygon', coordinates: [h3.cellToBoundary(id, true)]}
+    }))
+  };
+  return h3_data.geojson;
 }
 
 // Create labels for map *polygons* ----------------------------------------------------->
 
-function poly_tooltip(layer, ind_suffix = ''){
-  const props = layer.feature.properties;
+function poly_tooltip(layer, ind_suffix = '', columnar_props = null){
+  const props = feature_props(layer.feature, columnar_props);
   const cols = Object.keys(props);
   const LOW_POP_CUTOFF = 50;
 
@@ -44,15 +78,19 @@ function poly_tooltip(layer, ind_suffix = ''){
     vl: 'Viral load suppression'
   };
   Object.entries(indLabels).forEach(([ind, indLabel]) => {
-    const acc = ind === 'vr' ? 1 : 0.1;
+    // Viraemia values are an order of magnitude smaller, so show one more digit
+    const acc = ind === 'vr' ? 2 : 1;
     const meanVar = `${ind}_m${ind_suffix}`;
     const uiVars = [`${ind}_l${ind_suffix}`, `${ind}_u${ind_suffix}`];
-    var this_lab = '';
-    if (cols.includes(meanVar)) {
-      this_lab += `<i>${indLabel}</i>: ${(props[meanVar] * 100).toFixed(acc)}%`;
-    }
-    if (uiVars.every(v => cols.includes(v))) {
-      this_lab += ` (${pct(props[uiVars[0]], acc)} to ${pct(props[uiVars[1]], acc)})`;
+    if (!cols.includes(meanVar)) return;
+    var this_lab = `<i>${indLabel}</i>: `;
+    if (is_missing(props[meanVar])) {
+      this_lab += '<i>not estimated</i>';
+    } else {
+      this_lab += pct(props[meanVar], acc);
+      if (uiVars.every(v => cols.includes(v))) {
+        this_lab += ` (${pct(props[uiVars[0]], acc)} to ${pct(props[uiVars[1]], acc)})`;
+      }
     }
     labs.push(this_lab);
   });
@@ -72,17 +110,24 @@ function poly_tooltip(layer, ind_suffix = ''){
 
 // Create popup labels for map *points* ------------------------------------------------->
 
+// Lines whose value is missing from the data file are left out rather than shown as
+// "undefined" (excluded facilities, for example, have no catchment population).
 function point_popup(layer){
   const props = layer.feature.properties;
-  var inner_html = `
-    <b>${props['facility_name']}</b><br/>
-    <i>Type:</i> ${props['facility_type']}<br/>
-    <i>Location:</i> ${props['taname']} (${props['restype']})<br/>
-    <i>Services:</i> ${props['health_service']}<br/>
-    <i>ART cohort (Q4 2024):</i> ${cma(props['art_cumulative'])}<br/>
-    <i>Catchment population (15 to 49):</i> ${cma(props['pop_15to49'])}<br/>
-  `;
-  return inner_html;
+  const lines = [`<b>${props.facility_name}</b>`];
+  const add = (label, value) => {
+    if(!is_missing(value)) lines.push(`<i>${label}:</i> ${value}`);
+  };
+  add('Type', props.facility_type);
+  if(!is_missing(props.taname)) add('Location', `${props.taname} (${props.restype})`);
+  add('Services', props.services);
+  if(!is_missing(props.art_cumulative)){
+    add('ART cohort (Q4 2024)', cma(props.art_cumulative));
+  }
+  if(!is_missing(props.pop_15to49)){
+    add('Catchment population (15 to 49)', cma(props.pop_15to49));
+  }
+  return lines.join('<br/>');
 }
 
 
@@ -214,7 +259,8 @@ function new_geojson(data, options){
     interactive: true,
     overlay: false,
     tooltip: true,
-    use_pop_for_opacity: true
+    use_pop_for_opacity: true,
+    props: null  // columnar property table for H3 layers; see feature_props()
   };
   options = {...default_options, ...options};
   let fill_column = options.use_col + options.ind_suffix;
@@ -222,6 +268,7 @@ function new_geojson(data, options){
     .scale(options.fill_palette)
     .domain([options.lower, options.upper])
   );
+  const fill_color = (value) => is_missing(value) ? NA_COLOR : fill_scale(value).hex();
   var fill_opacity_fun = (_) => 0.5;
   if(options.use_pop_for_opacity){
     fill_opacity_fun = (pop) => {
@@ -241,11 +288,12 @@ function new_geojson(data, options){
     }
   } else {
     style_fun = (feature) => {
+      const props = feature_props(feature, options.props);
       return {
         weight: options.weight,
         color: options.color,
-        fillColor: fill_scale(feature.properties[fill_column]),
-        fillOpacity: fill_opacity_fun(feature.properties['pop_15to49'])
+        fillColor: fill_color(props[fill_column]),
+        fillOpacity: fill_opacity_fun(props['pop_15to49'])
       };
     }
   }
@@ -272,7 +320,9 @@ function new_geojson(data, options){
       {style: style_fun, interactive: options.interactive, onEachFeature: onEachFeature}
     )
   if(options.interactive && options.tooltip){
-    geojsonLayer.bindTooltip((layer) => poly_tooltip(layer, options.ind_suffix));
+    geojsonLayer.bindTooltip(
+      (layer) => poly_tooltip(layer, options.ind_suffix, options.props)
+    );
   }
   return geojsonLayer
 }
@@ -418,28 +468,38 @@ function create_district_map(id, bounds, options) {
     map.setView(map.getCenter(), options.zoom_min);
   }
 
+  // The H3 layer arrives as cell ids plus a column table; hexagons are built here (once
+  // per page) and every resolution layer recolours the same hexagons by a different
+  // column suffix.
+  const h3_geojson = h3_to_geojson(bounds.h3);
+  const h3_options = {...options, props: bounds.h3.props};
+
   // Create all toggleable resolution layers. Only the initially visible layer is built
   // now; the others are layer groups that build their contents the first time they are
   // selected in the layer control.
   var base_layers = {};
-  base_layers['High resolution'] = new_geojson(bounds.h3, {...options, weight: 0.15}).addTo(map);
+  base_layers['High resolution'] = new_geojson(
+    h3_geojson, {...h3_options, weight: 0.15}
+  ).addTo(map);
   base_layers['Group village head'] = lazy_layer_group(() => [
-    new_geojson(bounds.h3, {...options, interactive: false, ind_suffix: '_gvh'}),
+    new_geojson(h3_geojson, {...h3_options, interactive: false, ind_suffix: '_gvh'}),
     new_geojson(bounds.gvh, {...options, overlay: true, ind_suffix: '_gvh'})
   ]);
   base_layers['Traditional authority'] = lazy_layer_group(() => [
-    new_geojson(bounds.h3, {...options, interactive: false, ind_suffix: '_ta'}),
+    new_geojson(h3_geojson, {...h3_options, interactive: false, ind_suffix: '_ta'}),
     new_geojson(bounds.ta, {...options, overlay: true})
   ]);
   base_layers['Facility catchment'] = lazy_layer_group(() => [
-    new_geojson(bounds.h3, {...options, interactive: false, ind_suffix: '_facility'}),
-    new_geojson(bounds.facility_catchments, {...options, overlay: true, ind_suffix: '_facility'})
+    new_geojson(h3_geojson, {...h3_options, interactive: false, ind_suffix: '_facility'}),
+    new_geojson(
+      bounds.facility_catchments, {...options, overlay: true, ind_suffix: '_facility'}
+    )
   ]);
 
   // Add layers that may not exist: survey facilities
   if(bounds_keys.includes('survey_facilities')){
     base_layers['Survey facilities'] = lazy_layer_group(() => [
-      new_geojson(bounds.h3, {...options, interactive: false, ind_suffix: '_scf'}),
+      new_geojson(h3_geojson, {...h3_options, interactive: false, ind_suffix: '_scf'}),
       new_geojson(bounds.survey_facilities, {...options, overlay: true, ind_suffix: '_scf'})
     ]);
   }
