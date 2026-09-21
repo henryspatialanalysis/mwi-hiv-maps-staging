@@ -156,26 +156,10 @@ $banner-text-hover: #e8c9ca;
   padding: 1rem 0;
   background-color: $banner-color;
   color: $banner-text;
-  font-weight: bold;
+  font-style: italic;
 
   p {
-    margin-bottom: 0.25rem;
-  }
-
-  .footer-credit {
-    font-size: 0.8rem;
-    font-weight: normal;
     margin-bottom: 0;
-
-    a,
-    a:visited {
-      color: $banner-text;
-      text-decoration: underline;
-    }
-
-    a:hover {
-      color: $banner-text-hover;
-    }
   }
 }
 

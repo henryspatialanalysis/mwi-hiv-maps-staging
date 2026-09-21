@@ -180,12 +180,13 @@ and footer with white text, sticky header, district dropdown. Do not reintroduce
 banner text unreadable. `assets/leaflet-styles.css` holds the `.leaflet-map` sizing, the
 `.full-screen` class used by the iframe-able layouts, and the pointer-events rule for the
 GL canvases and the `basemapLabels` pane. The iframe tables are auto-resized by
-`iframe_loaded()` in `head.html`. The footer text comes from `description` in
-`_config.yml` plus the coat-of-arms credit hard-coded in `_includes/footer.html`.
+`iframe_loaded()` in `head.html`. The footer text is hard-coded in `_includes/footer.html`;
+`description` in `_config.yml` only feeds the SEO meta tags.
 
 The banner logo is `assets/images/mwi_coat_of_arms.svg` (Wikimedia Commons, CC BY-SA 3.0,
-credited in `_includes/footer.html`). Keep it an SVG: `*.png` is routed through Git LFS by
-`.gitattributes`, and the Pages checkout does not fetch LFS objects.
+credited at the bottom of `about.markdown`; keep that credit while this image is used).
+Keep it an SVG: `*.png` is routed through Git LFS by `.gitattributes`, and the Pages
+checkout does not fetch LFS objects.
 
 ## Conventions
 
