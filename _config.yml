@@ -1,6 +1,6 @@
 title: Malawi HIV Maps
 email: ""
-description: ""
+description: "Interactive maps of HIV indicators across Malawi's districts, produced by the RESPOND project."
 baseurl: "" # the subpath of your site, e.g. /blog
 url: "https://henryspatialanalysis.github.io/mwi-hiv-maps-staging/"
 
